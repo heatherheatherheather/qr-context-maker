@@ -14,13 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      qr_codes: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          last_scanned_at: string | null
+          scan_count: number
+          short_code: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label?: string
+          last_scanned_at?: string | null
+          scan_count?: number
+          short_code: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          last_scanned_at?: string | null
+          scan_count?: number
+          short_code?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_scan: {
+        Args: { p_short_code: string }
+        Returns: {
+          url: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
