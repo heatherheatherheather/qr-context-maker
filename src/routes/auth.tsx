@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { QrCode } from "lucide-react";
+import { signUpWithAccessCode } from "@/lib/auth.functions";
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
@@ -110,21 +111,28 @@ function SignInForm() {
 function SignUpForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [accessCode, setAccessCode] = useState("");
   const [pending, setPending] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setPending(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/`,
-      },
-    });
-    setPending(false);
-    if (error) toast.error(error.message);
-    else toast.success("Check your email to confirm your account.");
+    try {
+      await signUpWithAccessCode({
+        data: { email: email.trim(), password, accessCode: accessCode.trim() },
+      });
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (signInError) throw signInError;
+      toast.success("Account created");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Sign up failed";
+      toast.error(message);
+    } finally {
+      setPending(false);
+    }
   };
 
   return (
@@ -152,9 +160,23 @@ function SignUpForm() {
           placeholder="At least 6 characters"
         />
       </div>
+      <div className="space-y-2">
+        <Label htmlFor="signup-access-code">Access code</Label>
+        <Input
+          id="signup-access-code"
+          type="text"
+          required
+          value={accessCode}
+          onChange={(e) => setAccessCode(e.target.value)}
+          placeholder="Required to sign up"
+          autoComplete="off"
+          inputMode="numeric"
+        />
+      </div>
       <Button type="submit" className="w-full" disabled={pending}>
         {pending ? "Creating account…" : "Create account"}
       </Button>
     </form>
   );
 }
+
