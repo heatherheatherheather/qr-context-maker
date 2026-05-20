@@ -33,7 +33,7 @@ import { buildRedirectUrl, formatDate, generateShortCode } from "@/lib/qr-utils"
 
 type QrCode = Tables<"qr_codes">;
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   component: Index,
   head: () => ({
     meta: [
