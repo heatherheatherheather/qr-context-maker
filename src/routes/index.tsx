@@ -178,7 +178,7 @@ function Index() {
         submitLabel="Save"
         initial={editing ?? undefined}
         onSubmit={(v) =>
-          editing && updateMut.mutate({ id: editing.id, url: v.url, label: v.label })
+          editing && updateMut.mutate({ id: editing.id, url: v.url, label: v.label, description: v.description })
         }
         pending={updateMut.isPending}
       />
