@@ -37,7 +37,7 @@ export const Route = createFileRoute("/_authenticated/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "QR Code Manager" },
+      { title: "Cabana's Cute Cue-Are Code Console" },
       {
         name: "description",
         content: "Create, edit, and track scans for your QR codes in one dashboard.",
@@ -124,7 +124,7 @@ function Index() {
       <div className="mx-auto max-w-5xl">
         <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">QR Code Manager</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Cabana's Cute Cue-Are Code Console</h1>
             <p className="mt-1 text-muted-foreground">
               Create QR codes, track scans, and edit destinations anytime.
             </p>
