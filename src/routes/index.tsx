@@ -67,12 +67,13 @@ function Index() {
   });
 
   const createMut = useMutation({
-    mutationFn: async (input: { url: string; label: string }) => {
+    mutationFn: async (input: { url: string; label: string; description: string }) => {
       const { data, error } = await supabase
         .from("qr_codes")
         .insert({
           url: input.url,
           label: input.label,
+          description: input.description,
           short_code: generateShortCode(),
         })
         .select()
@@ -90,10 +91,10 @@ function Index() {
   });
 
   const updateMut = useMutation({
-    mutationFn: async (input: { id: string; url: string; label: string }) => {
+    mutationFn: async (input: { id: string; url: string; label: string; description: string }) => {
       const { error } = await supabase
         .from("qr_codes")
-        .update({ url: input.url, label: input.label })
+        .update({ url: input.url, label: input.label, description: input.description })
         .eq("id", input.id);
       if (error) throw error;
     },
@@ -177,7 +178,7 @@ function Index() {
         submitLabel="Save"
         initial={editing ?? undefined}
         onSubmit={(v) =>
-          editing && updateMut.mutate({ id: editing.id, url: v.url, label: v.label })
+          editing && updateMut.mutate({ id: editing.id, url: v.url, label: v.label, description: v.description })
         }
         pending={updateMut.isPending}
       />
@@ -243,6 +244,9 @@ function QrCard({
         <p className="line-clamp-2 font-medium text-foreground">
           {code.label || <span className="text-muted-foreground">(no label)</span>}
         </p>
+        {code.description ? (
+          <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{code.description}</p>
+        ) : null}
         <a
           href={code.url}
           target="_blank"
@@ -298,23 +302,25 @@ function CreateOrEditDialog({
   title: string;
   submitLabel: string;
   initial?: QrCode;
-  onSubmit: (v: { url: string; label: string }) => void;
+  onSubmit: (v: { url: string; label: string; description: string }) => void;
   pending: boolean;
 }) {
   const [url, setUrl] = useState("");
   const [label, setLabel] = useState("");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     if (open) {
       setUrl(initial?.url ?? "");
       setLabel(initial?.label ?? "");
+      setDescription(initial?.description ?? "");
     }
   }, [open, initial]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!url.trim()) return;
-    onSubmit({ url: url.trim(), label: label.trim() });
+    onSubmit({ url: url.trim(), label: label.trim(), description: description.trim() });
   };
 
   return (
@@ -346,6 +352,16 @@ function CreateOrEditDialog({
               onChange={(e) => setLabel(e.target.value)}
               placeholder="What is this QR code for?"
               rows={2}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="description">Description (optional)</Label>
+            <Textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="More details about where or how this QR code is used"
+              rows={3}
             />
           </div>
           <DialogFooter>
@@ -418,6 +434,9 @@ function ViewDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{code?.label || "QR code"}</DialogTitle>
+          {code?.description ? (
+            <DialogDescription>{code.description}</DialogDescription>
+          ) : null}
           <DialogDescription className="break-all">→ {code?.url}</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col items-center gap-4">
