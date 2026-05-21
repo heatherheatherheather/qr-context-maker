@@ -408,8 +408,8 @@ function ViewDialog({
     const size = 512;
     const padding = 32;
     const caption = code.label.trim();
-    const lineHeight = 24;
-    const lines = caption ? wrapText(caption, 40) : [];
+    const lineHeight = 44;
+    const lines = caption ? wrapText(caption, 28) : [];
     const captionH = lines.length ? lines.length * lineHeight + padding : 0;
 
     const canvas = document.createElement("canvas");
@@ -426,7 +426,7 @@ function ViewDialog({
 
     if (lines.length) {
       ctx.fillStyle = "#000";
-      ctx.font = "500 18px ui-sans-serif, system-ui, sans-serif";
+      ctx.font = "600 36px ui-sans-serif, system-ui, sans-serif";
       ctx.textAlign = "center";
       lines.forEach((line, i) => {
         ctx.fillText(line, canvas.width / 2, size + padding * 2 + (i + 1) * lineHeight - 4);
