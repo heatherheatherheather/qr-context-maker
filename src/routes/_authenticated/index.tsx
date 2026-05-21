@@ -433,8 +433,11 @@ function ViewDialog({
       });
     }
 
+    const d = new Date(code.created_at);
+    const yyyymmdd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
+    const safeLabel = (caption || "qr").replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "") || "qr";
     const link = document.createElement("a");
-    link.download = `${(caption || "qr-code").replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.png`;
+    link.download = `${safeLabel}-QR-Code-${yyyymmdd}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
   };
