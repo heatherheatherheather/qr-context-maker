@@ -408,8 +408,8 @@ function ViewDialog({
     const size = 512;
     const padding = 32;
     const caption = code.label.trim();
-    const lineHeight = 24;
-    const lines = caption ? wrapText(caption, 40) : [];
+    const lineHeight = 44;
+    const lines = caption ? wrapText(caption, 28) : [];
     const captionH = lines.length ? lines.length * lineHeight + padding : 0;
 
     const canvas = document.createElement("canvas");
