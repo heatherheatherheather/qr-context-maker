@@ -250,8 +250,8 @@ function QrCard({
         )}
       </button>
 
-      <div className="mt-4 min-h-[3rem]">
-        <p className="line-clamp-2 font-medium text-foreground">
+      <div className="mt-1 min-h-[3rem]">
+        <p className="line-clamp-2 text-lg font-semibold text-foreground">
           {code.label || <span className="text-muted-foreground">(no label)</span>}
         </p>
         {code.description ? (
