@@ -52,6 +52,7 @@ function Index() {
   const [editing, setEditing] = useState<QrCode | null>(null);
   const [deleting, setDeleting] = useState<QrCode | null>(null);
   const [viewing, setViewing] = useState<QrCode | null>(null);
+  const [search, setSearch] = useState("");
 
   const { data: codes, isLoading } = useQuery({
     queryKey: ["qr_codes"],
@@ -158,17 +159,47 @@ function Index() {
             </Button>
           </Card>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {codes.map((c) => (
-              <QrCard
-                key={c.id}
-                code={c}
-                onView={() => setViewing(c)}
-                onEdit={() => setEditing(c)}
-                onDelete={() => setDeleting(c)}
+          <>
+            <div className="mb-4">
+              <Input
+                type="search"
+                placeholder="Search by label or description…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="max-w-md"
               />
-            ))}
-          </div>
+            </div>
+            {(() => {
+              const q = search.trim().toLowerCase();
+              const filtered = q
+                ? codes.filter(
+                    (c) =>
+                      c.label.toLowerCase().includes(q) ||
+                      c.description.toLowerCase().includes(q),
+                  )
+                : codes;
+              if (filtered.length === 0) {
+                return (
+                  <p className="text-sm text-muted-foreground">
+                    No QR codes match "{search}".
+                  </p>
+                );
+              }
+              return (
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {filtered.map((c) => (
+                    <QrCard
+                      key={c.id}
+                      code={c}
+                      onView={() => setViewing(c)}
+                      onEdit={() => setEditing(c)}
+                      onDelete={() => setDeleting(c)}
+                    />
+                  ))}
+                </div>
+              );
+            })()}
+          </>
         )}
       </div>
 
