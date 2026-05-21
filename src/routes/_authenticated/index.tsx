@@ -52,6 +52,7 @@ function Index() {
   const [editing, setEditing] = useState<QrCode | null>(null);
   const [deleting, setDeleting] = useState<QrCode | null>(null);
   const [viewing, setViewing] = useState<QrCode | null>(null);
+  const [search, setSearch] = useState("");
 
   const { data: codes, isLoading } = useQuery({
     queryKey: ["qr_codes"],
