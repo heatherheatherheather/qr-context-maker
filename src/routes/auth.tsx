@@ -40,7 +40,7 @@ function AuthPage() {
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
             <QrCode className="h-6 w-6" />
           </div>
-          <h1 className="mt-3 text-2xl font-bold tracking-tight">Cabana's Cute Cue-Are Code Console</h1>
+          <h1 className="mt-3 text-2xl font-bold tracking-tight">🦄 Cabana's Cute Cue-Are Code Console</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Sign in to manage your QR codes.
           </p>
