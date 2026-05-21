@@ -37,7 +37,7 @@ export const Route = createFileRoute("/_authenticated/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "Cabana's Cute Cue-Are Code Console" },
+      { title: "🦄 Cabana's Cute Cue-Are Code Console" },
       {
         name: "description",
         content: "Create, edit, and track scans for your QR codes in one dashboard.",
