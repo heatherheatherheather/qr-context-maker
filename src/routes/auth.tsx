@@ -14,7 +14,7 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
   head: () => ({
     meta: [
-      { title: "Sign in · Cabana's Cute Cue-Are Code Console" },
+      { title: "Sign in · 🦄 Cabana's Cute Cue-Are Code Console" },
       { name: "description", content: "Sign in or create an account to manage your QR codes." },
     ],
   }),
