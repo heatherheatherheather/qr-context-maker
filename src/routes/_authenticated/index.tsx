@@ -426,7 +426,7 @@ function ViewDialog({
 
     if (lines.length) {
       ctx.fillStyle = "#000";
-      ctx.font = "500 18px ui-sans-serif, system-ui, sans-serif";
+      ctx.font = "600 36px ui-sans-serif, system-ui, sans-serif";
       ctx.textAlign = "center";
       lines.forEach((line, i) => {
         ctx.fillText(line, canvas.width / 2, size + padding * 2 + (i + 1) * lineHeight - 4);
