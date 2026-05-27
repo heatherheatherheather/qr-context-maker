@@ -53,6 +53,12 @@ function Index() {
   const [deleting, setDeleting] = useState<QrCode | null>(null);
   const [viewing, setViewing] = useState<QrCode | null>(null);
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
 
   const { data: codes, isLoading } = useQuery({
     queryKey: ["qr_codes"],
@@ -185,18 +191,47 @@ function Index() {
                   </p>
                 );
               }
+              const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+              const currentPage = Math.min(page, totalPages);
+              const start = (currentPage - 1) * pageSize;
+              const pageItems = filtered.slice(start, start + pageSize);
               return (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {filtered.map((c) => (
-                    <QrCard
-                      key={c.id}
-                      code={c}
-                      onView={() => setViewing(c)}
-                      onEdit={() => setEditing(c)}
-                      onDelete={() => setDeleting(c)}
-                    />
-                  ))}
-                </div>
+                <>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {pageItems.map((c) => (
+                      <QrCard
+                        key={c.id}
+                        code={c}
+                        onView={() => setViewing(c)}
+                        onEdit={() => setEditing(c)}
+                        onDelete={() => setDeleting(c)}
+                      />
+                    ))}
+                  </div>
+                  {totalPages > 1 && (
+                    <div className="mt-6 flex items-center justify-center gap-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                      >
+                        Previous
+                      </Button>
+                      <span className="text-sm text-muted-foreground">
+                        Page {currentPage} of {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  )}
+                </>
               );
             })()}
           </>
