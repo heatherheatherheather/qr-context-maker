@@ -298,14 +298,20 @@ function QrCard({
         </a>
       </div>
 
-      <div className="mt-3 flex items-center justify-between rounded-md bg-muted px-3 py-2 text-xs">
+      <div className="mt-3 grid grid-cols-3 gap-2 rounded-md bg-muted px-3 py-2 text-xs">
         <div>
           <div className="font-semibold text-foreground">{code.scan_count}</div>
           <div className="text-muted-foreground">scans</div>
         </div>
-        <div className="text-right text-muted-foreground">
+        <div className="text-muted-foreground">
           <div>Created</div>
-          <div>{formatDate(code.created_at)}</div>
+          <div className="text-foreground">{formatDate(code.created_at)}</div>
+        </div>
+        <div className="text-right text-muted-foreground">
+          <div>Last scanned</div>
+          <div className="text-foreground">
+            {code.last_scanned_at ? formatDate(code.last_scanned_at) : "—"}
+          </div>
         </div>
       </div>
 
