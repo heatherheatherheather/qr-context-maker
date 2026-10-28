@@ -1,11 +1,12 @@
-import { describe, expect, test } from "bun:test";
+import { describe, test } from "node:test";
+import { strict as assert } from "node:assert";
 import { qrRenderOptions } from "./qr-render";
 
 describe("Cabana QR generation", () => {
   test("uses the requested navy ink", () => {
-    expect(qrRenderOptions(512, "#222b60", "#ffffff").color.dark).toBe("#222b60");
+    assert.equal(qrRenderOptions(512, "#222b60", "#ffffff").color.dark, "#222b60");
   });
   test("uses high error correction for centered logos", () => {
-    expect(qrRenderOptions(512, "#222b60", "#ffffff").errorCorrectionLevel).toBe("H");
+    assert.equal(qrRenderOptions(512, "#222b60", "#ffffff").errorCorrectionLevel, "H");
   });
 });
