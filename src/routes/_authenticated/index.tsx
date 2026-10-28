@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import QRCode from "qrcode";
+import { renderQr, qrColors } from "@/lib/qr-render";
+import { Checkbox } from "@/components/ui/checkbox";
+import cabanaLogo from "@/assets/cabana-logo.png.asset.json";
 import { Plus, Pencil, Trash2, Download, ExternalLink, QrCode, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -32,6 +34,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import { buildRedirectUrl, formatDate, generateShortCode } from "@/lib/qr-utils";
 
 type QrCode = Tables<"qr_codes">;
+type QrInput = { url: string; label: string; description: string; include_logo: boolean };
 
 export const Route = createFileRoute("/_authenticated/")({
   component: Index,
@@ -42,6 +45,10 @@ export const Route = createFileRoute("/_authenticated/")({
         name: "description",
         content: "Create, edit, and track scans for your QR codes in one dashboard.",
       },
+      { property: "og:title", content: "Cabana's Cute Cue-Are Code Console" },
+      { property: "og:description", content: "Manage branded QR codes, destinations, and scan counts." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
 });
@@ -74,13 +81,14 @@ function Index() {
   });
 
   const createMut = useMutation({
-    mutationFn: async (input: { url: string; label: string; description: string }) => {
+    mutationFn: async (input: QrInput) => {
       const { data, error } = await supabase
         .from("qr_codes")
         .insert({
           url: input.url,
           label: input.label,
           description: input.description,
+          include_logo: input.include_logo,
           short_code: generateShortCode(),
         })
         .select()
@@ -98,10 +106,10 @@ function Index() {
   });
 
   const updateMut = useMutation({
-    mutationFn: async (input: { id: string; url: string; label: string; description: string }) => {
+    mutationFn: async (input: QrInput & { id: string }) => {
       const { error } = await supabase
         .from("qr_codes")
-        .update({ url: input.url, label: input.label, description: input.description })
+        .update({ url: input.url, label: input.label, description: input.description, include_logo: input.include_logo })
         .eq("id", input.id);
       if (error) throw error;
     },
@@ -254,7 +262,7 @@ function Index() {
         submitLabel="Save"
         initial={editing ?? undefined}
         onSubmit={(v) =>
-          editing && updateMut.mutate({ id: editing.id, url: v.url, label: v.label, description: v.description })
+          editing && updateMut.mutate({ id: editing.id, ...v })
         }
         pending={updateMut.isPending}
       />
@@ -299,14 +307,17 @@ function QrCard({
   const redirectUrl = useMemo(() => buildRedirectUrl(code.short_code), [code.short_code]);
 
   useEffect(() => {
-    QRCode.toDataURL(redirectUrl, { width: 256, margin: 1 }).then(setDataUrl);
-  }, [redirectUrl]);
+    let active = true;
+    setDataUrl("");
+    renderQr(redirectUrl, code.include_logo, 256).then((url) => active && setDataUrl(url)).catch((e: Error) => toast.error(e.message));
+    return () => { active = false; };
+  }, [redirectUrl, code.include_logo]);
 
   return (
     <Card className="flex flex-col p-4">
-      <button
+      <Button variant="ghost"
         onClick={onView}
-        className="group relative mx-auto aspect-square w-full max-w-[200px] overflow-hidden rounded-md bg-white p-2 transition hover:opacity-90"
+        className="group relative mx-auto h-auto aspect-square w-full max-w-[200px] overflow-hidden rounded-md bg-card p-2 transition hover:opacity-90"
         aria-label="View QR code"
       >
         {dataUrl ? (
@@ -314,7 +325,7 @@ function QrCard({
         ) : (
           <div className="h-full w-full animate-pulse bg-muted" />
         )}
-      </button>
+      </Button>
 
       <div className="mt-1 min-h-[3rem]">
         <p className="line-clamp-2 text-lg font-semibold text-foreground">
@@ -384,25 +395,27 @@ function CreateOrEditDialog({
   title: string;
   submitLabel: string;
   initial?: QrCode;
-  onSubmit: (v: { url: string; label: string; description: string }) => void;
+  onSubmit: (v: QrInput) => void;
   pending: boolean;
 }) {
   const [url, setUrl] = useState("");
   const [label, setLabel] = useState("");
   const [description, setDescription] = useState("");
+  const [includeLogo, setIncludeLogo] = useState(false);
 
   useEffect(() => {
     if (open) {
       setUrl(initial?.url ?? "");
       setLabel(initial?.label ?? "");
       setDescription(initial?.description ?? "");
+      setIncludeLogo(initial?.include_logo ?? false);
     }
   }, [open, initial]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!url.trim()) return;
-    onSubmit({ url: url.trim(), label: label.trim(), description: description.trim() });
+    onSubmit({ url: url.trim(), label: label.trim(), description: description.trim(), include_logo: includeLogo });
   };
 
   return (
@@ -446,6 +459,11 @@ function CreateOrEditDialog({
               rows={3}
             />
           </div>
+          <div className="flex items-center gap-3">
+            <Checkbox id="include-logo" checked={includeLogo} onCheckedChange={(checked) => setIncludeLogo(checked === true)} />
+            <Label htmlFor="include-logo">Add Cabana logo in the center</Label>
+            <img src={cabanaLogo.url} alt="Cabana" className="ml-auto h-auto w-24 shrink-0" />
+          </div>
           <DialogFooter>
             <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
               Cancel
@@ -471,8 +489,11 @@ function ViewDialog({
   const redirectUrl = code ? buildRedirectUrl(code.short_code) : "";
 
   useEffect(() => {
+    let active = true;
+    setDataUrl("");
     if (!code) return;
-    QRCode.toDataURL(redirectUrl, { width: 512, margin: 2 }).then(setDataUrl);
+    renderQr(redirectUrl, code.include_logo, 512).then((url) => active && setDataUrl(url)).catch((e: Error) => toast.error(e.message));
+    return () => { active = false; };
   }, [code, redirectUrl]);
 
   const handleDownload = async () => {
@@ -487,8 +508,10 @@ function ViewDialog({
     const canvas = document.createElement("canvas");
     canvas.width = size + padding * 2;
     canvas.height = size + padding * 2 + captionH;
-    const ctx = canvas.getContext("2d")!;
-    ctx.fillStyle = "#ffffff";
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const colors = qrColors();
+    ctx.fillStyle = colors.light;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const img = new Image();
@@ -497,7 +520,7 @@ function ViewDialog({
     ctx.drawImage(img, padding, padding, size, size);
 
     if (lines.length) {
-      ctx.fillStyle = "#000";
+      ctx.fillStyle = colors.caption;
       ctx.font = "600 36px ui-sans-serif, system-ui, sans-serif";
       ctx.textAlign = "center";
       lines.forEach((line, i) => {

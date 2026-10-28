@@ -1,0 +1,1 @@
+ALTER TABLE public.qr_codes ADD COLUMN IF NOT EXISTS include_logo boolean NOT NULL DEFAULT false;

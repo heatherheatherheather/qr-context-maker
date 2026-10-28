@@ -6,6 +6,7 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
@@ -33,7 +34,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
 
@@ -83,8 +84,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "🦄 Cabana's Cute QR Code Console" },
       { name: "twitter:description", content: "Create and manage QR codes with custom text, URLs, and descriptions." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fc98cfb6-d814-48e3-9914-f3f0820a4ae2/id-preview-6008cc83--7e809ded-52ea-4933-8f20-79db75347d86.lovable.app-1779305013458.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/fc98cfb6-d814-48e3-9914-f3f0820a4ae2/id-preview-6008cc83--7e809ded-52ea-4933-8f20-79db75347d86.lovable.app-1779305013458.png" },
     ],
     links: [
       {
