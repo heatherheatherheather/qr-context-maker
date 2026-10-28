@@ -33,7 +33,7 @@ export async function renderQr(url: string, includeLogo: boolean, width: number)
     const logo = await loadImage(cabanaLogo.url);
     const context = canvas.getContext("2d");
     if (!context) throw new Error("Unable to render QR code.");
-    const logoWidth = width * 0.26;
+    const logoWidth = width * 0.5;
     const logoHeight = logoWidth * logo.naturalHeight / logo.naturalWidth;
     const gap = width * 0.012;
     const x = (width - logoWidth) / 2;
