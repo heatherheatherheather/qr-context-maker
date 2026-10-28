@@ -16,6 +16,10 @@ export const Route = createFileRoute("/auth")({
     meta: [
       { title: "Sign in · 🦄 Cabana's Cute Cue-Are Code Console" },
       { name: "description", content: "Sign in or create an account to manage your QR codes." },
+      { property: "og:title", content: "Sign in · Cabana's Cute Cue-Are Code Console" },
+      { property: "og:description", content: "Sign in to manage Cabana QR codes." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
 });

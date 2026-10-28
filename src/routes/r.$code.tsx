@@ -4,6 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/r/$code")({
   component: RedirectPage,
+  head: () => ({ meta: [
+    { title: "QR destination · Cabana's Cute Cue-Are Code Console" },
+    { name: "description", content: "Open your Cabana QR code destination." },
+    { property: "og:title", content: "QR destination · Cabana" },
+    { property: "og:description", content: "Open your Cabana QR code destination." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 function RedirectPage() {
